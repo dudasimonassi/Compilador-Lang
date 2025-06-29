@@ -3,6 +3,7 @@ package compiler;
 import org.antlr.v4.runtime.*;
 import compiler.antlr.LangLexer;
 import compiler.antlr.LangParser;
+import compiler.interpreter.LangInterpreter; // Importe seu interpretador
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -20,8 +21,8 @@ public class Main {
             case "-syn":
                 processSyntax(fileName);
                 break;
-            case "i":
-                System.out.println("interpretador");
+            case "-i":
+                processInterpret(fileName);
                 break;
             default:
                 System.out.println("Diretiva não reconhecida: " + directive);
@@ -30,6 +31,35 @@ public class Main {
     }
 
     private static void processSyntax(String fileName) {
+        if (parseAndValidate(fileName)) {
+            System.out.println("accept");
+        } else {
+            System.out.println("reject");
+        }
+    }
+
+    private static void processInterpret(String fileName) {
+        if (parseAndValidate(fileName)) {
+            // Só chama o interpretador se a análise sintática for válida
+            try (InputStream is = new FileInputStream(fileName)) {
+                CharStream input = CharStreams.fromStream(is);
+                LangLexer lexer = new LangLexer(input);
+                CommonTokenStream tokens = new CommonTokenStream(lexer);
+                LangParser parser = new LangParser(tokens);
+
+                // Aqui você pode usar o visitor do interpretador
+                LangInterpreter interpreter = new LangInterpreter();
+                interpreter.visit(parser.prog());
+            } catch (Exception e) {
+                System.out.println("Erro ao interpretar: " + e.getMessage());
+            }
+        } else {
+            System.out.println("reject");
+        }
+    }
+
+    // Faz o parsing e retorna true se aceito, false se rejeitado
+    private static boolean parseAndValidate(String fileName) {
         try (InputStream is = new FileInputStream(fileName)) {
             CharStream input = CharStreams.fromStream(is);
             LangLexer lexer = new LangLexer(input);
@@ -45,13 +75,9 @@ public class Main {
 
             parser.prog();
 
-            if (errorListener.hasError()) {
-                System.out.println("reject");
-            } else {
-                System.out.println("accept");
-            }
+            return !errorListener.hasError();
         } catch (Exception e) {
-            System.out.println("reject");
+            return false;
         }
     }
 
