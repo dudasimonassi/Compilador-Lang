@@ -1,0 +1,14 @@
+data Person {
+    name :: String;   
+    age :: Int;
+}
+
+fun printAge() {
+    print age;        
+    return 0;         
+}
+
+fun main() {
+    p = new Person();
+    print p..name; 
+}

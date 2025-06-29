@@ -1,0 +1,29 @@
+abstract data Lista {
+    head :: Int;
+    tail :: Lista;
+    sum(a :: Int, b :: Int) : Int {
+        return a + b;
+    }
+}
+
+data Pessoa {
+    nome :: Char;
+    idade :: Int;
+    {- Comentario de bloco 
+    -}
+}
+
+main() {
+    p = new Pessoa;
+    p.nome = 'A';
+    p.idade = 30;
+    if (p.idade < 18) {
+        print 'M';
+    } else {
+        print 'A';
+    }
+    total = sum(10, 20);
+    iterate (i : 0) {
+        print i;
+    }
+}
